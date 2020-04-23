@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Tic-Tac-Toe App</string>
+    <string name="login_txt">Login</string>
+    <string name="enter_your_password_hint">Enter your password</string>
+    <string name="enter_your_email_hint">Enter your email</string>
+</resources>
