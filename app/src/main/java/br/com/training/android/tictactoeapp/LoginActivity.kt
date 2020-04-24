@@ -3,14 +3,17 @@ package br.com.training.android.tictactoeapp
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
     private var mAuth: FirebaseAuth? = null
+    private var database = FirebaseDatabase.getInstance()
+    private var myRef = database.reference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +31,19 @@ class LoginActivity : AppCompatActivity() {
             if(task.isSuccessful) {
                 Toast.makeText(applicationContext, "Successful login", Toast.LENGTH_LONG).show()
 
+                val currentUser = mAuth!!.currentUser
+
+                Log.d("TicTacToeDebuggingUser", "Current user is null? ${currentUser == null}")
+
+                if (currentUser != null) {
+                    val splitEmail = currentUser.email.toString().split("@")[0]
+
+                    myRef.child("players/users").child(splitEmail).setValue(currentUser.uid)
+                }
+
                 loadMain()
             } else {
-                Toast.makeText(applicationContext, "Fail login", Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext, "Login failed", Toast.LENGTH_LONG).show()
             }
         }
     }
