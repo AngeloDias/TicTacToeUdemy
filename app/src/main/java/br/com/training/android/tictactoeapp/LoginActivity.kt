@@ -23,10 +23,10 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun onLoginEvent(view: View) {
-        loginToFirebase(editTextEmail.text.toString(), editTextPassword.text.toString())
+        loginToFirebase(editTextEmailPlay.text.toString(), editTextPassword.text.toString())
     }
 
-    fun loginToFirebase(email: String, pass: String) {
+    private fun loginToFirebase(email: String, pass: String) {
         mAuth!!.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(this) {task ->
             if(task.isSuccessful) {
                 Toast.makeText(applicationContext, "Successful login", Toast.LENGTH_LONG).show()
@@ -38,7 +38,7 @@ class LoginActivity : AppCompatActivity() {
                 if (currentUser != null) {
                     val splitEmail = currentUser.email.toString().split("@")[0]
 
-                    myRef.child("players/users").child(splitEmail).setValue(currentUser.uid)
+                    myRef.child("users").child(splitEmail).child("request").setValue(currentUser.uid)
                 }
 
                 loadMain()

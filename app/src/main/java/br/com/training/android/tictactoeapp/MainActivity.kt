@@ -6,21 +6,32 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     private var mFirebaseAnalytics: FirebaseAnalytics? = null
+    private var database = FirebaseDatabase.getInstance()
+    private var myRef = database.reference
+    private var myEmail: String? = null
+    private var player1WinsCounts = 0
+    private var player2WinsCounts = 0
+    private var activePlayer = 1
+    private var player1 = ArrayList<Int>()
+    private var player2 = ArrayList<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        val bundle: Bundle = intent.extras!!
+        myEmail = bundle.getString("email")
     }
 
-    fun buClick( view:View){
+    fun buClick(view:View){
         val buSelected = view as Button
         var cellId = 0
 
@@ -42,11 +53,7 @@ class MainActivity : AppCompatActivity() {
         playGame(cellId,buSelected)
     }
 
-    var activePlayer = 1
-    var player1 = ArrayList<Int>()
-    var player2 = ArrayList<Int>()
-
-    fun playGame(cellId:Int, buSelected:Button){
+    private fun playGame(cellId:Int, buSelected:Button){
 
         if( activePlayer == 1 ){
             buSelected.text = "X"
@@ -68,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         checkWinner()
     }
 
-    fun checkWinner() {
+    private fun checkWinner() {
         var winer = -1
 
         // row 1
@@ -132,7 +139,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun autoPlay(){
+    private fun autoPlay(){
             val emptyCells = ArrayList<Int>()
 
             for( cellId in 1..9){
@@ -165,10 +172,7 @@ class MainActivity : AppCompatActivity() {
             playGame(cellId, buSelected)
     }
 
-    var player1WinsCounts = 0
-    var player2WinsCounts = 0
-
-    fun restartGame(){
+    private fun restartGame(){
 
         activePlayer = 1
         player1.clear()
@@ -195,6 +199,16 @@ class MainActivity : AppCompatActivity() {
         }
 
          Toast.makeText(this,"Player1: $player1WinsCounts, Player2: $player2WinsCounts", Toast.LENGTH_LONG).show()
+    }
+
+    fun btnRequestEvent(view: View) {
+        val userEmail = editTextEmailPlay.text.toString()
+
+        myRef.child("users").child(userEmail).child("request").push().setValue(myEmail)
+    }
+
+    fun btnAcceptEvent(view: View) {
+        val userEmail = editTextEmailPlay.text.toString()
     }
 
 }
