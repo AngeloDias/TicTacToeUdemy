@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_login.*
+import java.lang.Exception
 
 class LoginActivity : AppCompatActivity() {
     private var mAuth: FirebaseAuth? = null
@@ -23,11 +24,12 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun onLoginEvent(view: View) {
-        loginToFirebase(editTextEmailPlay.text.toString(), editTextPassword.text.toString())
+        loginToFirebase(editTextEmailLogin.text.toString(), editTextPassword.text.toString())
     }
 
     private fun loginToFirebase(email: String, pass: String) {
         mAuth!!.createUserWithEmailAndPassword(email, pass).addOnCompleteListener(this) {task ->
+
             if(task.isSuccessful) {
                 Toast.makeText(applicationContext, "Successful login", Toast.LENGTH_LONG).show()
 
@@ -38,13 +40,21 @@ class LoginActivity : AppCompatActivity() {
                 if (currentUser != null) {
                     val splitEmail = currentUser.email.toString().split("@")[0]
 
-                    myRef.child("users").child(splitEmail).child("request").setValue(currentUser.uid)
+                    try {
+                        myRef.child("users").child(splitEmail).child("request")
+                            .setValue(currentUser.uid)
+                    } catch (exc: Exception) {
+                        exc.printStackTrace()
+                    }
                 }
 
                 loadMain()
             } else {
                 Toast.makeText(applicationContext, "Login failed", Toast.LENGTH_LONG).show()
+                task.exception?.printStackTrace()
             }
+        }.addOnFailureListener { exception ->
+            exception.printStackTrace()
         }
     }
 
